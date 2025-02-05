@@ -1,0 +1,44 @@
+[
+  {
+    "user": "belk_25",
+    "route": "Horseka → Ногинск",
+    "time": "21:10 (до Дикси, Заречье)",
+    "date": "05.02.2025"
+  },
+  {
+    "user": "IvanPetrovic",
+    "route": "Horseka → Ногинск",
+    "time": "21:10 (до Дикси, Заречье)",
+    "date": "05.02.2025"
+  },
+  {
+    "user": "nshishan",
+    "route": "Ногинск → Horseka",
+    "time": "09:00",
+    "date": "06.02.2025"
+  },
+  {
+    "user": "nshishan",
+    "route": "Ногинск → Horseka",
+    "time": "09:00",
+    "date": "07.02.2025"
+  },
+  {
+    "user": "nshishan",
+    "route": "Horseka → Ногинск",
+    "time": "21:10",
+    "date": "08.02.2025"
+  },
+  {
+    "user": "nshishan",
+    "route": "Horseka → Ногинск",
+    "time": "21:10 (до Дикси, Заречье)",
+    "date": "10.02.2025"
+  },
+  {
+    "user": "belk_25",
+    "route": "Horseka → Ногинск",
+    "time": "18:20 (с заездом в ЧГ)",
+    "date": "05.02.2025"
+  }
+]
