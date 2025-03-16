@@ -5,39 +5,40 @@ const fs = require('fs');
 const TOKEN = '7919443932:AAHi5pdtfGViGxsaZni0oIgL04iqsJNXUqc';
 const bot = new TelegramBot(TOKEN, { polling: true });
 
-const ADMIN_CHAT_IDS = ['1091383569', '234526643'];
+const ADMIN_CHAT_IDS = ['1091383569', '234526643','926954965' ,'5601820760', '5145026881','1137493485'];
 const ordersFilePath = './orders.json';
 
 const scheduleData = {
     'Понедельник': {
         "Ногинск → Horseka": ['07:00', '09:00'],
-        "Horseka → Ногинск": ['08:15', '18:20 (с заездом в ЧГ)', '21:10 (до Дикси, Заречье)', '22:20']
+        "Horseka → Ногинск": ['08:00 (с заездом в ЧГ)', '18:20 (с заездом в ЧГ)', '21:10 (до Дикси, Заречье)', '22:20']
     },
     'Вторник': {
         "Ногинск → Horseka": ['07:00', '09:00'],
-        "Horseka → Ногинск": ['08:15', '18:20 (с заездом в ЧГ)', '21:10 (до Дикси, Заречье)', '22:20']
+        "Horseka → Ногинск": ['08:00 (с заездом в ЧГ)', '18:20 (с заездом в ЧГ)', '21:10 (до Дикси, Заречье)', '22:20']
     },
     'Среда': {
         "Ногинск → Horseka": ['07:00', '09:00'],
-        "Horseka → Ногинск": ['08:15', '18:20 (с заездом в ЧГ)', '21:10 (до Дикси, Заречье)', '22:20']
+        "Horseka → Ногинск": ['08:00 (с заездом в ЧГ)', '18:20 (с заездом в ЧГ)', '21:10 (до Дикси, Заречье)', '22:20']
     },
     'Четверг': {
         "Ногинск → Horseka": ['07:00', '09:00'],
-        "Horseka → Ногинск": ['08:15', '18:20 (с заездом в ЧГ)', '21:10 (до Дикси, Заречье)', '22:20']
+        "Horseka → Ногинск": ['08:00 (с заездом в ЧГ)', '18:20 (с заездом в ЧГ)', '21:10 (до Дикси, Заречье)', '22:20']
     },
     'Пятница': {
         "Ногинск → Horseka": ['07:00', '09:00'],
-        "Horseka → Ногинск": ['08:15', '18:20 (с заездом в ЧГ)', '21:10', '23:20']
+        "Horseka → Ногинск": ['08:00 (с заездом в ЧГ)', '18:20 (с заездом в ЧГ)', '21:10', '23:20']
     },
     'Суббота': {
         "Ногинск → Horseka": ['07:00', '09:00'],
-        "Horseka → Ногинск": ['08:15', '18:20 (с заездом в ЧГ)', '21:10', '23:20']
+        "Horseka → Ногинск": ['08:00 (с заездом в ЧГ)', '18:20 (с заездом в ЧГ)', '21:10', '23:20']
     },
     'Воскресенье': {
         "Ногинск → Horseka": ['07:00', '09:00'],
-        "Horseka → Ногинск": ['08:15', '18:20 (с заездом в ЧГ)', '21:10 (до Дикси, Заречье)', '22:20']
+        "Horseka → Ногинск": ['08:00 (с заездом в ЧГ)', '18:20 (с заездом в ЧГ)', '21:10 (до Дикси, Заречье)', '22:20']
     }
 };
+
 function getDayAndDate(dayOfWeek) {
     const today = new Date();
     const daysOfWeek = ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
@@ -48,12 +49,12 @@ function getDayAndDate(dayOfWeek) {
 
     let daysUntilTrip = targetDayIndex - currentDayIndex;
     if (daysUntilTrip < 0) daysUntilTrip += 7; 
-
     const tripDate = new Date();
     tripDate.setDate(today.getDate() + daysUntilTrip);
 
     return new Intl.DateTimeFormat("ru-RU", { day: "2-digit", month: "2-digit", year: "numeric" }).format(tripDate);
 }
+
 function loadOrders() {
     try {
         return JSON.parse(fs.readFileSync(ordersFilePath, 'utf8')) || [];
@@ -66,10 +67,8 @@ function saveOrders(orders) {
     fs.writeFileSync(ordersFilePath, JSON.stringify(orders, null, 2), 'utf8');
 }
 
-
 let orders = loadOrders();
 let userState = {};
-
 
 function sendTomorrowOrdersToAdmin() {
     const tomorrow = new Date();
@@ -95,12 +94,10 @@ function sendAllOrdersToAdmin() {
         return;
     }
 
-
     orders.sort((a, b) => {
         const dateA = new Date(a.date);
         const dateB = new Date(b.date);
         if (dateA.getTime() === dateB.getTime()) {
-     
             const timeA = a.time.split(':').map(Number);
             const timeB = b.time.split(':').map(Number);
             return timeA[0] - timeB[0] || timeA[1] - timeB[1];
@@ -124,9 +121,8 @@ function sendAllOrdersToAdmin() {
     });
 }
 
-
-schedule.scheduleJob('0 22 * * *', sendTomorrowOrdersToAdmin);
-
+// Изменено время автоматического оповещения на 22:15
+schedule.scheduleJob('15 22 * * *', sendTomorrowOrdersToAdmin);
 
 bot.onText(/\/start/, (msg) => {
     userState[msg.chat.id] = { step: 'selecting_day' };
@@ -158,7 +154,7 @@ bot.onText(/\/all/, (msg) => {
 bot.on('message', (msg) => {
     const chatId = msg.chat.id;
     const text = msg.text;
-console.log(chatId);
+    console.log(chatId);
 
     if (text.startsWith('/')) return;
 
@@ -181,7 +177,6 @@ console.log(chatId);
             }
         });
     } else if (user.step === 'selecting_time' && Object.values(scheduleData[user.day]).flat().includes(text)) {
-       
         const formattedDate = getDayAndDate(user.day);
 
         orders.push({ user: msg.from.username || msg.from.first_name, route: user.direction, time: text, date: formattedDate });
@@ -204,6 +199,5 @@ console.log(chatId);
         }
     } 
 });
-
 
 bot.on('polling_error', (error) => console.error('Polling error:', error));
