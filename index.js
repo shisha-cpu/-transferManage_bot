@@ -1,47 +1,48 @@
 const TelegramBot = require('node-telegram-bot-api');
 const schedule = require('node-schedule');
 const fs = require('fs');
+const moment = require('moment-timezone'); // Добавляем moment-timezone для работы с временными зонами
 
 const TOKEN = '7919443932:AAHi5pdtfGViGxsaZni0oIgL04iqsJNXUqc';
 const bot = new TelegramBot(TOKEN, { polling: true });
 
-const ADMIN_CHAT_IDS = ['1091383569', '234526643','926954965' ,'5601820760', '5145026881','1137493485'];
+const ADMIN_CHAT_IDS = ['1091383569', '234526643', '926954965', '5601820760', '5145026881', '1137493485'];
 const ordersFilePath = './orders.json';
 
 const scheduleData = {
     'Понедельник': {
         "Ногинск → Horseka": ['07:00', '09:00'],
-        "Черноголовка → Horseka": ['07:30'], // Новое направление
+        "Черноголовка → Horseka": ['07:30'],
         "Horseka → Ногинск": ['08:00 (с заездом в ЧГ)', '18:20 (с заездом в ЧГ)', '21:10 (до Дикси, Заречье)', '22:10']
     },
     'Вторник': {
         "Ногинск → Horseka": ['07:00', '09:00'],
-        "Черноголовка → Horseka": ['07:30'], // Новое направление
+        "Черноголовка → Horseka": ['07:30'],
         "Horseka → Ногинск": ['08:00 (с заездом в ЧГ)', '18:20 (с заездом в ЧГ)', '21:10 (до Дикси, Заречье)', '22:10']
     },
     'Среда': {
         "Ногинск → Horseka": ['07:00', '09:00'],
-        "Черноголовка → Horseka": ['07:30'], // Новое направление
+        "Черноголовка → Horseka": ['07:30'],
         "Horseka → Ногинск": ['08:00 (с заездом в ЧГ)', '18:20 (с заездом в ЧГ)', '21:10 (до Дикси, Заречье)', '22:10']
     },
     'Четверг': {
         "Ногинск → Horseka": ['07:00', '09:00'],
-        "Черноголовка → Horseka": ['07:30'], // Новое направление
+        "Черноголовка → Horseka": ['07:30'],
         "Horseka → Ногинск": ['08:00 (с заездом в ЧГ)', '18:20 (с заездом в ЧГ)', '21:10 (до Дикси, Заречье)', '22:10']
     },
     'Пятница': {
         "Ногинск → Horseka": ['07:00', '09:00'],
-        "Черноголовка → Horseka": ['07:30'], // Новое направление
+        "Черноголовка → Horseka": ['07:30'],
         "Horseka → Ногинск": ['08:00 (с заездом в ЧГ)', '18:20 (с заездом в ЧГ)', '21:10', '23:10']
     },
     'Суббота': {
         "Ногинск → Horseka": ['07:00', '09:00'],
-        "Черноголовка → Horseka": ['07:30'], // Новое направление
+        "Черноголовка → Horseka": ['07:30'],
         "Horseka → Ногинск": ['08:00 (с заездом в ЧГ)', '18:20 (с заездом в ЧГ)', '21:10', '23:10']
     },
     'Воскресенье': {
         "Ногинск → Horseka": ['07:00', '09:00'],
-        "Черноголовка → Horseka": ['07:30'], // Новое направление
+        "Черноголовка → Horseka": ['07:30'],
         "Horseka → Ногинск": ['08:00 (с заездом в ЧГ)', '18:20 (с заездом в ЧГ)', '21:10 (до Дикси, Заречье)', '22:10']
     }
 };
@@ -55,7 +56,7 @@ function getDayAndDate(dayOfWeek) {
     const currentDayIndex = daysOfWeek.indexOf(currentDayOfWeek);
 
     let daysUntilTrip = targetDayIndex - currentDayIndex;
-    if (daysUntilTrip < 0) daysUntilTrip += 7; 
+    if (daysUntilTrip < 0) daysUntilTrip += 7;
 
     const tripDate = new Date();
     tripDate.setDate(today.getDate() + daysUntilTrip);
@@ -129,8 +130,13 @@ function sendAllOrdersToAdmin() {
     });
 }
 
-// Время автоматического оповещения изменено на 22:15
-schedule.scheduleJob('15 22 * * *', sendTomorrowOrdersToAdmin);
+// Указываем временную зону для задачи
+const rule = new schedule.RecurrenceRule();
+rule.hour = 22;
+rule.minute = 15;
+rule.tz = 'Europe/Moscow'; // Указываем временную зону (например, для Москвы)
+
+schedule.scheduleJob(rule, sendTomorrowOrdersToAdmin);
 
 bot.onText(/\/start/, (msg) => {
     userState[msg.chat.id] = { step: 'selecting_day' };
@@ -167,7 +173,7 @@ bot.on('message', (msg) => {
     if (text.startsWith('/')) return;
 
     const user = userState[chatId] || {};
-    
+
     if (user.step === 'selecting_day' && scheduleData[text]) {
         userState[chatId] = { step: 'selecting_direction', day: text };
         bot.sendMessage(chatId, `Выберите направление на ${text}:`, {
@@ -205,7 +211,7 @@ bot.on('message', (msg) => {
             bot.sendMessage(chatId, 'Спасибо! Если хотите создать новую заявку, нажмите /start.');
             delete userState[chatId];
         }
-    } 
+    }
 });
 
 bot.on('polling_error', (error) => console.error('Polling error:', error));
